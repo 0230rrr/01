@@ -1468,7 +1468,7 @@
                         const dayNames = ['日', '一', '二', '三', '四', '五', '六'];
                         html += `<div class="cal-week-header ${isToday ? 'today' : ''}"><span class="day-name">${dayNames[d.getDay()]}</span><span class="day-num">${d.getDate()}</span></div>`;
                     });
-                    for (let h = 8; h < 22; h++) {
+                    for (let h = 5; h < 23; h++) {
                         html += `<div class="cal-hour-label">${String(h).padStart(2, '0')}:00</div>`;
                         days.forEach(d => {
                             html += `<div class="cal-week-cell">`;
