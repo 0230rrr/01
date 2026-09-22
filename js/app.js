@@ -58,6 +58,12 @@
                         if (!t.schedule) t.schedule = [];
                         if (!t.tags) t.tags = [];
                         if (!t.subtasks) t.subtasks = [];
+                        if (!t.color) {
+                            const hash = t.title
+                                ? t.title.split('').reduce((a, c) => a + c.charCodeAt(0), 0)
+                                : Math.floor(Math.random() * TASK_COLORS.length);
+                            t.color = TASK_COLORS[hash % TASK_COLORS.length];
+                        }
                     };
                     area.tracks.forEach((track, i) => {
                         if (!track.color) track.color = TRACK_COLORS[i % TRACK_COLORS.length];
@@ -1662,6 +1668,18 @@
                     <div class="drawer-field"><div class="drawer-label">Description</div><textarea class="drawer-textarea" id="dTaskDesc" onchange="window.autoSaveTaskField('${task.id}', 'description', this.value)">${escapeHtml(task.description || '')}</textarea></div>
                     <div class="drawer-field"><div class="drawer-label">Status</div><select class="drawer-select" id="dTaskStatus" onchange="window.autoSaveTaskField('${task.id}', 'status', this.value)">${statusOptions.map(o => `<option value="${o.value}" ${task.status === o.value ? 'selected' : ''}>${o.label}</option>`).join('')}</select></div>
                     <div class="drawer-field"><div class="drawer-label">Priority</div><select class="drawer-select" id="dTaskPriority" onchange="window.autoSaveTaskField('${task.id}', 'priority', this.value)">${priorityOptions.map(o => `<option value="${o.value}" ${task.priority === o.value ? 'selected' : ''}>${o.label}</option>`).join('')}</select></div>
+                    <div class="drawer-field">
+                        <div class="drawer-label">顏色</div>
+                        <div class="task-color-swatches">
+                            ${TASK_COLORS.map(c => `
+                                <div class="task-color-swatch ${(task.color === c) ? 'selected' : ''}"
+                                     style="background:${c};"
+                                     onclick="window.setTaskColor('${task.id}', '${c}')">
+                                    ${task.color === c ? '<span class="check">✓</span>' : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
                     <div class="drawer-field"><div class="drawer-label">所屬</div><div style="font-size:0.8rem;color:#6d5437;">${escapeHtml(area.name)}${track ? ` · ${escapeHtml(track.name)}` : ' · 未分類'}</div></div>
                     <div class="drawer-field"><div class="drawer-label">開始日（清空即為未排程）</div><input class="drawer-input" type="date" id="dTaskStart" value="${task.startDate || ''}" onchange="window.autoSaveTaskField('${task.id}', 'startDate', this.value)"></div>
                     <div class="drawer-field"><div class="drawer-label">截止日（任務在時間軸上是一個點）</div><input class="drawer-input" type="date" id="dTaskDue" value="${task.dueDate || ''}" onchange="window.autoSaveTaskField('${task.id}', 'dueDate', this.value)"></div>
@@ -2047,6 +2065,17 @@
                 if (!found) return;
                 found.track.color = color;
                 save(); renderAll();
+            };
+                
+            window.setTaskColor = function(taskId, color) {
+                const found = findTaskById(taskId);
+                if (!found) return;
+                found.task.color = color;
+                save();
+                renderAll();
+                if (document.getElementById('drawer').classList.contains('show')) {
+                    window.openTaskDrawer(taskId);
+                }
             };
 
             window.sortMilestonesByDue = function(trackId) {
