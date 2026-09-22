@@ -679,7 +679,7 @@
                             else dueText = `${dueDate.toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' })} 到期`;
                         }
                         const priorityLabel = { high: '高', medium: '中', low: '低' }[task.priority] || '';
-                        const trackColor = track ? (track.color || TRACK_COLORS[0]) : '#c9b89c';
+                        const trackColor = task.color || (track ? (track.color || TRACK_COLORS[0]) : '#c9b89c');
                         let msNames = '';
                         if (track && task.milestoneIds && task.milestoneIds.length > 0) {
                             msNames = task.milestoneIds.map(id => {
@@ -1120,7 +1120,7 @@
                         if (idx === -1) return;
                         const leftPct = ((idx + 0.5) / days.length) * 100;
                         const completedClass = task.completed ? ' completed' : '';
-                        html += `<div class="timeline-task-dot${completedClass}" style="left:${leftPct}%;background:${color};" title="${escapeHtml(task.title)}" onclick="event.stopPropagation();window.openTaskDrawer('${task.id}')"></div>`;
+                        html += `<div class="timeline-task-dot${completedClass}" style="left:${leftPct}%;background:${task.color || color};" title="${escapeHtml(task.title)}" onclick="event.stopPropagation();window.openTaskDrawer('${task.id}')"></div>`;
                     });
                 }
 
@@ -1343,7 +1343,7 @@
                         if (idx === -1) return;
                         const leftPct = ((idx + 0.5) / cells.length) * 100;
                         const completedClass = task.completed ? ' completed' : '';
-                        html += `<div class="timeline-task-dot${completedClass}" style="left:${leftPct}%;background:${color};" title="${escapeHtml(task.title)}" onclick="event.stopPropagation();window.openTaskDrawer('${task.id}')"></div>`;
+                        html += `<div class="timeline-task-dot${completedClass}" style="left:${leftPct}%;background:${task.color || color};" title="${escapeHtml(task.title)}" onclick="event.stopPropagation();window.openTaskDrawer('${task.id}')"></div>`;
                     });
                 }
 
@@ -1417,7 +1417,7 @@
                         (track.tasks || []).forEach(task => {
                             (task.schedule || []).forEach(sch => {
                                 const start = new Date(sch.start);
-                                if (dateKey(start) === dateKey(d)) blocks.push({ task, start: new Date(sch.start), end: new Date(sch.end), color });
+                                if (dateKey(start) === dateKey(d)) blocks.push({ task, start: new Date(sch.start), end: new Date(sch.end), color: task.color || color });
                             });
                         });
                     });
@@ -1458,7 +1458,7 @@
                     tracks.forEach(({ track }) => {
                         const color = track.color || TRACK_COLORS[0];
                         (track.tasks || []).forEach(task => {
-                            (task.schedule || []).forEach(sch => allBlocks.push({ task, start: new Date(sch.start), end: new Date(sch.end), color }));
+                            (task.schedule || []).forEach(sch => allBlocks.push({ task, start: new Date(sch.start), end: new Date(sch.end), color: task.color || color }));
                         });
                     });
                     html += `<div class="calendar-wrapper"><div class="cal-week-grid">`;
@@ -1509,7 +1509,7 @@
                             for (let d = new Date(start); d <= end; d = addDays(d, 1)) {
                                 const k = dateKey(d);
                                 if (!taskDates[k]) taskDates[k] = [];
-                                taskDates[k].push({ task: t, color });
+                                taskDates[k].push({ task: t, color: t.color || color });
                             }
                         });
                         (track.milestones || []).forEach(ms => {
