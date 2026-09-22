@@ -33,6 +33,12 @@
                 '#b9822e', '#8fa882', '#c99b5e', '#7a96a8', '#c9886e',
                 '#a8b89a', '#c9a6b8', '#8b9dc3', '#d4a5a5', '#9cb4a8'
             ];
+                
+            const TASK_COLORS = [
+                '#b9822e', '#8fa882', '#c99b5e', '#7a96a8', '#c9886e',
+                '#a8b89a', '#c9a6b8', '#8b9dc3', '#d4a5a5', '#9cb4a8',
+                '#dbb88a', '#9fb7b0', '#c4a0a0', '#b0aec9', '#a8b08c'
+            ];
 
             const STORAGE_KEY = 'luneAppData';
 
