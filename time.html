@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>月庭 · 時間與任務</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo">
+                    <span class="moon-icon">☽</span>
+                    <span>月庭</span>
+                </div>
+                <div class="tagline">Time &amp; Life</div>
+            </div>
+
+            <div class="nav-group">
+                <button class="nav-item active" data-page="overview">總覽</button>
+                <div class="areas-sublist" id="areasSublist">
+                    <div class="areas-sublabel">Areas</div>
+                </div>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-group-label">Work</div>
+                <button class="nav-item" data-page="mytasks">我的任務</button>
+                <button class="nav-item" data-page="projects">專案</button>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-group-label">Plan</div>
+                <button class="nav-item" data-page="timeline">時間軸</button>
+                <button class="nav-item" data-page="calendar">日曆</button>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-group-label">Analyze</div>
+                <button class="nav-item" data-page="insights">洞察</button>
+            </div>
+        </aside>
+
+        <main class="main">
+            <div class="topbar">
+                <div class="topbar-left">
+                    <div class="topbar-date" id="topbarDate"></div>
+                    <div class="topbar-welcome" id="topbarWelcome">晚安</div>
+                </div>
+                <div class="topbar-right">
+                    <div class="topbar-weather">☀ 晴 26°C</div>
+                    <div class="topbar-icon" title="搜尋">⌕</div>
+                    <div class="topbar-icon" title="設定">⚙</div>
+                </div>
+            </div>
+
+            <div class="page active" id="page-overview"><div id="overviewContent"></div></div>
+            <div class="page" id="page-mytasks">
+                <div class="filter-bar">
+                    <span class="filter-label">Area</span>
+                    <select id="mytasksAreaFilter" class="custom-select"><option value="all">全部領域</option></select>
+                    <span style="width:1px;height:16px;background:var(--line);"></span>
+                    <button class="filter-tab active" data-filter="all">全部</button>
+                    <button class="filter-tab" data-filter="active">進行中</button>
+                    <button class="filter-tab" data-filter="completed">已完成</button>
+                    <button class="filter-tab" data-filter="overdue">逾期</button>
+                    <button class="filter-tab" data-filter="today">今天</button>
+                    <button class="filter-tab" data-filter="unscheduled">未排程</button>
+                </div>
+                <div id="mytasksContent"></div>
+            </div>
+            <div class="page" id="page-projects">
+                <div class="filter-bar">
+                    <span class="filter-label">Area</span>
+                    <select id="projectsAreaFilter" class="custom-select"><option value="all">全部領域</option></select>
+                </div>
+                <div id="projectsContent"></div>
+            </div>
+            <div class="page" id="page-trackdetail"><div id="trackDetailContent"></div></div>
+            <div class="page" id="page-timeline">
+                <div class="toolbar">
+                    <span class="filter-label">View</span>
+                    <button class="view-tab active" data-tl-view="week">週</button>
+                    <button class="view-tab" data-tl-view="month">月</button>
+                    <button class="view-tab" data-tl-view="quarter">三個月</button>
+                    <button class="view-tab" data-tl-view="halfyear">半年</button>
+                    <button class="view-tab" data-tl-view="year">一年</button>
+                    <span class="filter-label" id="tlCountLabel" style="margin-left:1rem;">週數</span>
+                    <select id="tlCountSelect" class="custom-select">
+                        <option value="1">1 週</option>
+                        <option value="2">2 週</option>
+                        <option value="3">3 週</option>
+                        <option value="4">4 週</option>
+                        <option value="5">5 週</option>
+                        <option value="6">6 週</option>
+                    </select>
+                    <span class="filter-label" style="margin-left:1rem;">Area</span>
+                    <select id="timelineAreaFilter" class="custom-select"><option value="all">全部領域</option></select>
+                    <button class="timeline-toggle" id="tlShowTasks">
+                        <span class="check-box">✓</span>
+                        顯示任務
+                    </button>
+                    <div class="toolbar-nav">
+                        <button class="nav-arrow" id="tlPrev">‹</button>
+                        <span class="toolbar-date" id="tlDateRange"></span>
+                        <button class="nav-arrow" id="tlNext">›</button>
+                        <button class="btn-today" id="tlToday">今天</button>
+                    </div>
+                </div>
+                <div class="semester-settings">
+                    <label>
+                        <input type="checkbox" id="bindSemester">
+                        <span class="checkbox-box"></span>
+                        綁定學期
+                    </label>
+                    <label id="semesterStartLabel" style="display:none;">
+                        學期開始：<input type="date" id="semesterStart" value="2026-09-01">
+                    </label>
+                    <label id="semesterEndModeLabel" style="display:none;">
+                        學期結束：
+                        <select id="semesterEndMode">
+                            <option value="date">指定日期</option>
+                            <option value="week">指定第幾週</option>
+                        </select>
+                    </label>
+                    <label id="semesterEndDateLabel" style="display:none;">
+                        <input type="date" id="semesterEndDate" value="2027-01-12">
+                    </label>
+                    <label id="semesterEndWeekLabel" style="display:none;">
+                        第 <input type="number" id="semesterEndWeek" value="18" min="1" max="30"> 週
+                    </label>
+                    <span class="hint" id="semesterHint">未綁定學期 · 自由翻動</span>
+                </div>
+                <div id="timelineContent"></div>
+            </div>
+            <div class="page" id="page-calendar">
+                <div class="toolbar">
+                    <span class="filter-label">View</span>
+                    <button class="view-tab active" data-cal-view="day">日</button>
+                    <button class="view-tab" data-cal-view="week">週</button>
+                    <button class="view-tab" data-cal-view="month">月</button>
+                    <span class="filter-label" style="margin-left:1rem;">Area</span>
+                    <select id="calendarAreaFilter" class="custom-select"><option value="all">全部領域</option></select>
+                    <div class="toolbar-nav">
+                        <button class="nav-arrow" id="calPrev">‹</button>
+                        <span class="toolbar-date" id="calDateRange"></span>
+                        <button class="nav-arrow" id="calNext">›</button>
+                        <button class="btn-today" id="calToday">今天</button>
+                    </div>
+                </div>
+                <div id="calendarContent"></div>
+            </div>
+            <div class="page" id="page-insights">
+                <div class="filter-bar">
+                    <span class="filter-label">Area</span>
+                    <select id="insightsAreaFilter" class="custom-select"><option value="all">全部領域</option></select>
+                </div>
+                <div id="insightsContent"></div>
+            </div>
+        </main>
+    </div>
+
+    <div class="drawer-overlay" id="drawerOverlay"></div>
+    <div class="drawer" id="drawer">
+        <div class="drawer-header">
+            <div class="drawer-title" id="drawerTitle">任務詳情</div>
+            <button class="drawer-close" id="drawerClose">✕</button>
+        </div>
+        <div class="drawer-body" id="drawerBody"></div>
+    </div>
+    <script src="js/app.js"></script>
+</body>
+</html>
