@@ -28,6 +28,8 @@
 
             let currentTrackId = null;
             let addTaskPanelOpen = false;
+            let multiSelectMode = false;
+            let multiSelectedTaskIds = new Set();
 
             const TRACK_COLORS = [
                 '#b9822e', '#8fa882', '#c99b5e', '#7a96a8', '#c9886e',
@@ -663,8 +665,16 @@
                     if (a.task.dueDate && b.task.dueDate) return new Date(a.task.dueDate) - new Date(b.task.dueDate);
                     return 0;
                 });
-
-                let html = `<div class="task-list-flat">`;
+                let toolbarHtml = `
+                    <div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;align-items:center;">
+                        <button class="filter-tab ${multiSelectMode ? 'active' : ''}" onclick="window.toggleMultiSelectMode()">
+                            ${multiSelectMode ? '✕ 結束多選' : '☑ 多選'}
+                        </button>
+                        ${multiSelectMode ? `<span style="font-size:0.7rem;color:var(--muted);">已選 ${multiSelectedTaskIds.size} 個</span>` : ''}
+                        ${multiSelectMode ? `<button class="filter-tab" style="color:var(--red);border-color:rgba(168,80,60,0.5);" onclick="window.deleteSelectedTasks()">刪除選中</button>` : ''}
+                    </div>
+                `;
+                let html = toolbarHtml + `<div class="task-list-flat">`;
                 if (allTasks.length === 0) {
                     html += `<div class="empty-section"><span class="empty-text">沒有符合條件的任務。</span></div>`;
                 } else {
@@ -688,7 +698,7 @@
                             }).filter(s => s).join(' · ');
                         }
                         html += `
-                            <div class="flat-task ${task.completed ? 'completed' : ''}" style="border-left:3px solid ${trackColor};">
+                            <div class="flat-task ${task.completed ? 'completed' : ''}" style="border-left:3px solid ${trackColor};${multiSelectMode && multiSelectedTaskIds.has(task.id) ? 'background:rgba(221,184,108,0.3);' : ''}">
                                 <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="window.toggleTaskFromList('${task.id}')">
                                 <div style="flex:1;min-width:200px;">
                                     <div class="breadcrumb">
@@ -696,7 +706,7 @@
                                         ${track ? `<span style="color:${trackColor};">${escapeHtml(track.name)}</span>` : `<span>未分類</span>`}
                                         ${msNames ? `<span class="sep">·</span><span>${escapeHtml(msNames)}</span>` : ''}
                                     </div>
-                                    <div class="task-name" onclick="window.openTaskDrawer('${task.id}')" style="cursor:pointer;">${escapeHtml(task.title)}</div>
+                                    <div class="task-name" onclick="${multiSelectMode ? `window.toggleTaskSelection('${task.id}')` : `window.openTaskDrawer('${task.id}')`}" style="cursor:pointer;">${escapeHtml(task.title)}</div>
                                 </div>
                                 <div class="task-right">
                                     ${priorityLabel ? `<span>${priorityLabel}</span>` : ''}
@@ -2020,6 +2030,34 @@
                 if (!found) return;
                 found.task.completed = !found.task.completed;
                 found.task.status = found.task.completed ? 'completed' : 'not-started';
+                save(); renderAll();
+            };
+            window.toggleMultiSelectMode = function() {
+                multiSelectMode = !multiSelectMode;
+                multiSelectedTaskIds.clear();
+                renderAll();
+            };
+
+            window.toggleTaskSelection = function(taskId) {
+                if (multiSelectedTaskIds.has(taskId)) multiSelectedTaskIds.delete(taskId);
+                else multiSelectedTaskIds.add(taskId);
+                renderMyTasks();
+            };
+
+            window.deleteSelectedTasks = function() {
+                if (multiSelectedTaskIds.size === 0) {
+                    alert('請先選擇要刪除的任務');
+                    return;
+                }
+                if (!confirm(`確定要刪除選中的 ${multiSelectedTaskIds.size} 個任務嗎？`)) return;
+                for (const area of areas) {
+                    for (const track of area.tracks) {
+                        track.tasks = (track.tasks || []).filter(t => !multiSelectedTaskIds.has(t.id));
+                    }
+                    area.unassignedTasks = (area.unassignedTasks || []).filter(t => !multiSelectedTaskIds.has(t.id));
+                }
+                multiSelectedTaskIds.clear();
+                multiSelectMode = false;
                 save(); renderAll();
             };
 
